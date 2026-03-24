@@ -1,12 +1,27 @@
 services:
+  tts-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    ports:
+      - "${PROXY_PORT:-8092}:8092"
+    environment:
+      - UPSTREAM_URL=http://qwen3-tts:8091
+      - PROXY_PORT=8092
+      - VOICES_DIR=/app/voices
+    volumes:
+      - voices_data:/app/voices
+    depends_on:
+      - qwen3-tts
+
   qwen3-tts:
     build:
       context: .
       args:
         VLLM_OMNI_VERSION: ${VLLM_OMNI_VERSION:-v0.16.0}
         TORCH_CUDA_ARCH_LIST: ${TORCH_CUDA_ARCH_LIST:-8.0;8.6;8.9;9.0}
-    ports:
-      - "${PORT:-8091}:8091"
+    expose:
+      - "8091"
     environment:
       - MODEL=${MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-Base}
       - PORT=8091
@@ -42,3 +57,4 @@ services:
 
 volumes:
   hf_cache:
+  voices_data:

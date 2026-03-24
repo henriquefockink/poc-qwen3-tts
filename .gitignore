@@ -23,5 +23,8 @@ setup-docker.sh
 __pycache__/
 *.pyc
 
+# Voices
+voices/
+
 # Temp
 /tmp/
