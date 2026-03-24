@@ -1,0 +1,27 @@
+# Models and HF cache
+hf_cache/
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+*.onnx
+
+# Audio files
+*.wav
+*.mp3
+*.flac
+*.ogg
+
+# Environment
+.env
+
+# Docker
+setup-docker.sh
+
+# Python
+__pycache__/
+*.pyc
+
+# Temp
+/tmp/

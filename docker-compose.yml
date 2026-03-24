@@ -1,0 +1,44 @@
+services:
+  qwen3-tts:
+    build:
+      context: .
+      args:
+        VLLM_OMNI_VERSION: ${VLLM_OMNI_VERSION:-v0.16.0}
+        TORCH_CUDA_ARCH_LIST: ${TORCH_CUDA_ARCH_LIST:-8.0;8.6;8.9;9.0}
+    ports:
+      - "${PORT:-8091}:8091"
+    environment:
+      - MODEL=${MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-Base}
+      - PORT=8091
+      - TRUST_REMOTE_CODE=${TRUST_REMOTE_CODE:-true}
+      - ENFORCE_EAGER=${ENFORCE_EAGER:-true}
+      - GPU_MEMORY_UTILIZATION_STAGE0=${GPU_MEMORY_UTILIZATION_STAGE0:-0.3}
+      - GPU_MEMORY_UTILIZATION_STAGE1=${GPU_MEMORY_UTILIZATION_STAGE1:-0.3}
+      - MAX_NUM_SEQS=${MAX_NUM_SEQS:-10}
+      - MAX_MODEL_LEN_STAGE0=${MAX_MODEL_LEN_STAGE0:-4096}
+      - MAX_MODEL_LEN_STAGE1=${MAX_MODEL_LEN_STAGE1:-32768}
+      # Sampling defaults (stage 0 - talker)
+      - TEMPERATURE=${TEMPERATURE:-0.9}
+      - TOP_K=${TOP_K:-50}
+      - TOP_P=${TOP_P:-1.0}
+      - MAX_TOKENS=${MAX_TOKENS:-4096}
+      - REPETITION_PENALTY=${REPETITION_PENALTY:-1.05}
+      - SEED=${SEED:-42}
+      # HuggingFace
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HF_HOME=/root/.cache/huggingface
+    volumes:
+      - ${HF_CACHE_DIR:-hf_cache}:/root/.cache/huggingface
+      - ./stage_configs:/app/stage_configs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${GPU_COUNT:-1}
+              capabilities: [gpu]
+    ipc: host
+    shm_size: "4g"
+
+volumes:
+  hf_cache:
